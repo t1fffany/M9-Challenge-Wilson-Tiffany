@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +28,10 @@ public class RecordStoreController {
 
     @RequestMapping(value = "/records", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Record createRecord(@RequestBody @Valid Record record) {
-
+    public Record createRecord(@RequestBody @Valid Record record, Principal principal) {
+        if (!principal.getName().equals("adminUser")) {
+            return null;
+        }
         record.setId(idCounter++);
         recordList.add(record);
 
@@ -37,7 +40,10 @@ public class RecordStoreController {
 
     @RequestMapping(value = "/records", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Record> getAllRecords() {
+    public List<Record> getAllRecords(Principal principal) {
+        if (!principal.getName().equals("adminUser")) {
+            return null;
+        }
 
         return recordList;
     }
@@ -46,7 +52,10 @@ public class RecordStoreController {
 
     @RequestMapping(value = "/records/{id}", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    public Record getRecordById(@PathVariable int id) {
+    public Record getRecordById(@PathVariable int id, Principal principal) {
+        if (!principal.getName().equals("adminUser")) {
+            return null;
+        }
         Record foundRecord = null;
 
         for(Record record : recordList) {
@@ -61,7 +70,10 @@ public class RecordStoreController {
 
     @RequestMapping(value = "/records/{id}", method = RequestMethod.PUT)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void updateRecordById(@PathVariable int id, @RequestBody Record record) {
+    public void updateRecordById(@PathVariable int id, @RequestBody Record record, Principal principal) {
+        if (!principal.getName().equals("adminUser")) {
+            return;
+        }
         int index = -1;
 
         for(int i = 0; i < recordList.size(); i++) {
@@ -78,7 +90,10 @@ public class RecordStoreController {
 
     @RequestMapping(value = "/records/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deleteRecordById(@PathVariable int id) {
+    public void deleteRecordById(@PathVariable int id, Principal principal) {
+        if (!principal.getName().equals("adminUser")) {
+            return;
+        }
         int index = -1;
 
         for(int i = 0; i < recordList.size(); i++) {
